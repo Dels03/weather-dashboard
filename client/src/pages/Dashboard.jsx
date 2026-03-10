@@ -8,7 +8,6 @@ import EmptyState from "../components/EmptyState";
 import WeatherMap from "../components/WeatherMap";
 import { getWeather, getForecast } from "../services/weatherApi";
 
-// Major world cities to display
 const MAJOR_CITIES = [
   { name: "New York", country: "US", id: "new-york" },
   { name: "London", country: "GB", id: "london" },
@@ -37,7 +36,6 @@ const Dashboard = () => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
-  // Fetch major cities weather on mount
   useEffect(() => {
     fetchMajorCitiesWeather();
   }, []);
@@ -89,7 +87,6 @@ const Dashboard = () => {
     setLastUpdated(new Date());
   };
 
-  // Helper to get emoji icon based on weather code
   const getWeatherIcon = (iconCode) => {
     if (!iconCode) return "â˜€ï¸";
     const code = iconCode.substring(0, 2);
@@ -105,7 +102,6 @@ const Dashboard = () => {
     return "â˜€ï¸";
   };
 
-  // Handle click on a major city
   const handleCityClick = async (city) => {
     if (
       currentWeather?.city === city.city &&
@@ -148,7 +144,6 @@ const Dashboard = () => {
     setRefreshing(false);
   };
 
-  // Loading skeleton for city cards
   const CitySkeleton = () => (
     <div className="bg-white/5 rounded-2xl p-4 animate-pulse">
       <div className="flex items-start justify-between">
@@ -165,7 +160,6 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
       <main className="p-6">
-        {/* Tabs and refresh */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-6">
             {["today", "tomorrow", "next7days"].map((tab) => (
@@ -207,9 +201,7 @@ const Dashboard = () => {
           )}
         </div>
 
-        {/* Content Grid */}
         <div className="grid grid-cols-12 gap-6">
-          {/* Left Section - Main Content */}
           <div className="col-span-12 lg:col-span-8 space-y-6">
             {showFavorites && (
               <div className="animate-slide-down">
@@ -234,7 +226,6 @@ const Dashboard = () => {
               </div>
             )}
 
-            {/* Main Forecast Display - Now using ForecastList only */}
             {!loading && forecast && forecast.length > 0 && (
               <div className="animate-fade-in-up">
                 <ForecastList forecast={forecast} />
@@ -243,7 +234,6 @@ const Dashboard = () => {
 
             {!loading && !error && !currentWeather && <EmptyState />}
 
-            {/* Global Map */}
             <div className="bg-white/5 rounded-3xl p-6 border border-white/10 hover:border-white/20 transition-all group">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -251,9 +241,7 @@ const Dashboard = () => {
                   <h3 className="text-lg font-semibold">Global Map</h3>
                 </div>
                 <button
-                  onClick={() => {
-                    // Map reset handled internally
-                  }}
+                  onClick={() => {}}
                   className="text-sm text-white/40 hover:text-white/60 transition-colors flex items-center gap-1"
                 >
                   Reset view <span className="text-lg">â†º</span>
@@ -263,9 +251,7 @@ const Dashboard = () => {
             </div>
           </div>
 
-          {/* Right Section - Sidebar */}
           <div className="col-span-12 lg:col-span-4 space-y-6">
-            {/* Quick Actions */}
             <div className="flex items-center space-x-2 bg-white/5 rounded-xl p-1 border border-white/10">
               <button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg py-2 text-sm font-medium shadow-lg">
                 Forecast
@@ -275,12 +261,10 @@ const Dashboard = () => {
               </button>
             </div>
 
-            {/* Precipitation Chart */}
             {forecast && forecast.length > 0 && (
               <PrecipitationChart forecast={forecast} />
             )}
 
-            {/* Major Cities */}
             <div className="bg-white/5 rounded-3xl p-6 border border-white/10">
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -347,7 +331,6 @@ const Dashboard = () => {
                             </div>
                           </div>
 
-                          {/* Weather details */}
                           <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/5">
                             <div className="flex items-center gap-1">
                               <span className="text-xs text-white/30">í²§</span>
