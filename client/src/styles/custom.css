@@ -1,0 +1,372 @@
+/* client/src/styles/custom.css */
+/* Updated to match reference design - cleaner, less glassmorphism */
+
+/* ============================================
+   CARD SYSTEM - Matching Reference Design
+   ============================================ */
+
+/* Glass effect cards - MORE SUBTLE */
+.glass-card {
+  background: rgba(255, 255, 255, 0.03); /* Less visible */
+  backdrop-filter: blur(12px); /* Less blur */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  transition: all 200ms ease;
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Today's card - Blue to Orange gradient (from reference) */
+.today-card {
+  background: linear-gradient(135deg, #4a90e2 0%, #5ba3f5 50%, #f5a623 100%);
+  border-radius: 18px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  transition: all 300ms ease;
+}
+
+.today-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(74, 144, 226, 0.3);
+}
+
+/* Forecast card - Simple dark cards */
+.forecast-card {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1rem;
+  min-width: 100px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 200ms ease;
+}
+
+.forecast-card:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(74, 144, 226, 0.3);
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   BUTTON STYLES - Cleaner
+   ============================================ */
+
+.btn-primary {
+  padding: 0.625rem 1.5rem;
+  background: linear-gradient(to right, #4a90e2, #5ba3f5);
+  border-radius: 12px;
+  font-weight: 500;
+  color: white;
+  box-shadow: 0 4px 8px rgba(74, 144, 226, 0.2);
+  transition: all 200ms ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(to right, #3b7bc9, #4a90e2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 12px rgba(74, 144, 226, 0.3);
+}
+
+.btn-icon {
+  width: 2.5rem;
+  height: 2.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 200ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.btn-icon:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+   TEXT GRADIENTS
+   ============================================ */
+
+.text-gradient-blue {
+  background: linear-gradient(135deg, #4a90e2, #5ba3f5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-gradient-temp {
+  background: linear-gradient(180deg, #fff 0%, #4a90e2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ============================================
+   CHARTS & DATA VISUALIZATION
+   ============================================ */
+
+/* Precipitation bar - Cleaner gradient */
+.precipitation-bar {
+  border-top-left-radius: 6px;
+  border-top-right-radius: 6px;
+  transition: all 200ms ease;
+  background: linear-gradient(to top, #4a90e2, #5ba3f5);
+}
+
+/* Wind status bars */
+.wind-bar {
+  background: rgba(74, 144, 226, 0.3);
+  border-radius: 4px;
+  transition: all 200ms ease;
+}
+
+.wind-bar:hover {
+  background: rgba(74, 144, 226, 0.5);
+}
+
+/* UV Index circle */
+.uv-circle {
+  stroke: #4a90e2;
+  stroke-width: 8;
+  fill: none;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.5s ease;
+}
+
+/* ============================================
+   INPUT STYLES - Cleaner
+   ============================================ */
+
+.input-search {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  font-size: 0.875rem;
+  color: white;
+  transition: all 200ms ease;
+}
+
+.input-search:focus {
+  outline: none;
+  border-color: rgba(74, 144, 226, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.input-search::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+/* ============================================
+   SCROLLBAR - Minimal
+   ============================================ */
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(74, 144, 226, 0.4);
+}
+
+/* ============================================
+   BORDER UTILITIES
+   ============================================ */
+
+.border-glass {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.border-glass-hover {
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+/* ============================================
+   ANIMATION UTILITIES
+   ============================================ */
+
+.animate-float {
+  animation: float 4s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.5s ease-in-out infinite;
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.animate-bounce-subtle {
+  animation: bounceSubtle 1.8s ease-in-out infinite;
+}
+
+.animate-snow {
+  animation: snow 2.5s ease-in-out infinite;
+}
+
+/* Stagger children - smoother */
+.stagger-children > * {
+  opacity: 0;
+  animation: fadeInUp 0.4s ease-out forwards;
+}
+
+.stagger-children > *:nth-child(1) {
+  animation-delay: 0.05s;
+}
+.stagger-children > *:nth-child(2) {
+  animation-delay: 0.1s;
+}
+.stagger-children > *:nth-child(3) {
+  animation-delay: 0.15s;
+}
+.stagger-children > *:nth-child(4) {
+  animation-delay: 0.2s;
+}
+.stagger-children > *:nth-child(5) {
+  animation-delay: 0.25s;
+}
+
+/* ============================================
+   HOVER EFFECTS
+   ============================================ */
+
+.hover-glow {
+  transition: all 200ms ease;
+}
+
+.hover-glow:hover {
+  box-shadow: 0 0 20px rgba(74, 144, 226, 0.2);
+}
+
+.hover-lift {
+  transition: transform 200ms ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px);
+}
+
+/* ============================================
+   GRID LAYOUTS - Responsive
+   ============================================ */
+
+.weather-grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.weather-main {
+  grid-column: span 12 / span 12;
+}
+
+@media (min-width: 1024px) {
+  .weather-main {
+    grid-column: span 8 / span 8;
+  }
+
+  .weather-grid {
+    gap: 1.5rem;
+  }
+}
+
+.weather-sidebar {
+  grid-column: span 12 / span 12;
+}
+
+@media (min-width: 1024px) {
+  .weather-sidebar {
+    grid-column: span 4 / span 4;
+  }
+}
+
+/* ============================================
+   BADGE & LABELS
+   ============================================ */
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  background: rgba(74, 144, 226, 0.1);
+  color: #4a90e2;
+  border: 1px solid rgba(74, 144, 226, 0.2);
+}
+
+.label-sm {
+  font-size: 0.625rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 500;
+}
+
+/* ============================================
+   DATA CARDS - Reference Style
+   ============================================ */
+
+.data-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  padding: 1.25rem;
+  transition: all 200ms ease;
+}
+
+.data-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.data-card-label {
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  margin-bottom: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.data-card-value {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: white;
+  line-height: 1.2;
+}
+
+.data-card-unit {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.6);
+  margin-left: 0.25rem;
+}
