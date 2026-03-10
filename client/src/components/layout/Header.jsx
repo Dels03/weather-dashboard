@@ -1,4 +1,13 @@
-import { Search, Settings, Moon, Sun, MapPin, Bell, Grid, Star, Cloud, Droplets, Wind, ThermometerSun } from "lucide-react";
+import {
+  Search,
+  Settings,
+  Moon,
+  Sun,
+  MapPin,
+  Bell,
+  Grid,
+  Star,
+} from "lucide-react";
 import SearchBar from "../SearchBar";
 import { useWeather } from "../../context/WeatherContext";
 import { useTheme } from "../../context/ThemeContext";
@@ -9,10 +18,13 @@ const Header = ({ showFavorites, setShowFavorites }) => {
   const { currentWeather } = useWeather();
   const { isDark, toggleTheme } = useTheme();
   const navigate = useNavigate();
+
+  // Notification state
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
 
+  // Generate weather-based notifications
   useEffect(() => {
     if (currentWeather) {
       const newNotifications = [];
@@ -23,7 +35,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Rain Expected",
           message: `Don't forget your umbrella in ${currentWeather.city}!`,
           time: "Just now",
-          icon: <Droplets className="w-5 h-5 text-blue-400" />
+          icon: "️",
         });
       }
 
@@ -33,7 +45,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "High Temperature",
           message: `It's ${Math.round(currentWeather.temperature)}°C in ${currentWeather.city}. Stay hydrated!`,
           time: "Just now",
-          icon: <ThermometerSun className="w-5 h-5 text-orange-400" />
+          icon: "",
         });
       }
 
@@ -43,7 +55,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Cold Weather",
           message: `Bundle up! It's ${Math.round(currentWeather.temperature)}°C in ${currentWeather.city}.`,
           time: "Just now",
-          icon: <Cloud className="w-5 h-5 text-blue-200" />
+          icon: "❄️",
         });
       }
 
@@ -53,7 +65,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Windy Conditions",
           message: `Strong winds (${Math.round(currentWeather.windSpeed)} km/h) in ${currentWeather.city}.`,
           time: "Just now",
-          icon: <Wind className="w-5 h-5 text-gray-400" />
+          icon: "",
         });
       }
 
@@ -69,6 +81,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
   return (
     <header className="border-b border-white/5 px-6 py-4 sticky top-0 bg-[#0a0a0a]/80 backdrop-blur-xl z-50">
       <div className="flex items-center justify-between">
+        {/* Left Section */}
         <div className="flex items-center space-x-4">
           <button
             onClick={() => navigate("/")}
