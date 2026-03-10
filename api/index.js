@@ -10,14 +10,14 @@ require("dotenv").config();
 // Import routes
 const weatherRoutes = require("./routes/weather.routes");
 
-const app = express(); // <-- This was missing!
+const app = express();
 
 // Security middleware
 app.use(helmet());
 app.use(compression());
 
-// =============== CORS CONFIGURATION ===============
-const corsOptions = {
+// CORS configuration
+app.use(cors({
   origin: [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
@@ -25,39 +25,9 @@ const corsOptions = {
   ].filter(Boolean),
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: [
-    "Content-Type",
-    "Authorization",
-    "X-Requested-With",
-    "Accept",
-  ],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
   optionsSuccessStatus: 200,
-};
-
-app.use(cors(corsOptions));
-
-// Handle preflight requests - FIXED VERSION (no wildcard *)
-app.use((req, res, next) => {
-  if (req.method === "OPTIONS") {
-    res.header(
-      "Access-Control-Allow-Origin",
-      req.headers.origin || "http://localhost:5173",
-    );
-    res.header(
-      "Access-Control-Allow-Methods",
-      "GET, POST, PUT, DELETE, OPTIONS",
-    );
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Requested-With, Accept",
-    );
-    res.header("Access-Control-Allow-Credentials", "true");
-    res.header("Access-Control-Max-Age", "86400");
-    return res.status(200).json({});
-  }
-  next();
-});
-// =============== END CORS CONFIGURATION ===============
+}));
 
 // Rate limiting
 const limiter = rateLimit({
@@ -74,13 +44,9 @@ app.use(express.urlencoded({ extended: true }));
 // Logging
 app.use(morgan("dev"));
 
-// =============== TEST ENDPOINTS ===============
+// Test endpoints
 app.get("/api/test", (req, res) => {
-  res.json({
-    success: true,
-    message: "API test endpoint working!",
-    timestamp: new Date(),
-  });
+  res.json({ success: true, message: "API test endpoint working!", timestamp: new Date() });
 });
 
 app.get("/api/test-cors", (req, res) => {
@@ -91,7 +57,6 @@ app.get("/api/test-cors", (req, res) => {
     timestamp: new Date(),
   });
 });
-// =============== END TEST ENDPOINTS ===============
 
 // Routes
 app.use("/api/weather", weatherRoutes);
@@ -101,13 +66,9 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date() });
 });
 
-// 404 handler - FIXED VERSION (no wildcard *)
+// 404 handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    message: "Route not found",
-    path: req.originalUrl,
-  });
+  res.status(404).json({ success: false, message: "Route not found", path: req.originalUrl });
 });
 
 // Error handling middleware
@@ -116,32 +77,36 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
-    error:
-      process.env.NODE_ENV === "development"
-        ? { message: err.message, stack: err.stack }
-        : {},
+    error: process.env.NODE_ENV === "development" ? { message: err.message, stack: err.stack } : {},
   });
 });
 
-// MongoDB connection
-const connectDB = async () => {
+// MongoDB connection - cache the connection for serverless
+let cachedDb = null;
+
+async function connectToDatabase() {
+  if (cachedDb) return cachedDb;
+  
   try {
-    await mongoose.connect(process.env.MONGODB_URI);
-    console.log("✅ MongoDB connected successfully");
+    const connection = await mongoose.connect(process.env.MONGODB_URI);
+    cachedDb = connection;
+    console.log("✅ MongoDB connected");
+    return connection;
   } catch (error) {
     console.error("❌ MongoDB connection error:", error);
-    process.exit(1);
+    throw error;
   }
-};
+}
 
-connectDB();
+// Wrap routes to ensure DB connection
+app.use("/api/weather", async (req, res, next) => {
+  try {
+    await connectToDatabase();
+    next();
+  } catch (error) {
+    res.status(500).json({ error: "Database connection failed" });
+  }
+}, weatherRoutes);
 
-const PORT = process.env.PORT || 5001;
-app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌐 CORS enabled for: http://localhost:5173`);
-  console.log(`🔧 Test endpoints:`);
-  console.log(`   - http://localhost:${PORT}/api/test`);
-  console.log(`   - http://localhost:${PORT}/api/test-cors`);
-  console.log(`   - http://localhost:${PORT}/health`);
-});
+// Export for Vercel serverless
+module.exports = app;
