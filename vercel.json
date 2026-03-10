@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "api/index.js": {
-      "runtime": "nodejs@18.x"
-    }
-  },
   "rewrites": [
     {
       "source": "/api/(.*)",
@@ -16,7 +11,7 @@
   ],
   "builds": [
     {
-      "src": "api/**/*.js",
+      "src": "api/index.js",
       "use": "@vercel/node"
     },
     {
