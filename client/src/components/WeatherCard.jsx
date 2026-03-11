@@ -14,13 +14,11 @@ import { getCurrentCityTime, formatCityTimeOnly } from "../utils/dateFormatter";
 const WeatherCard = ({ weather }) => {
   if (!weather) return null;
 
-  console.log("📦 WeatherCard received full weather:", weather);
-
   const {
     city,
     country,
     temperature,
-    weather: weatherData,
+    weather: weatherData, // This is the nested object
     feelsLike,
     tempMin,
     tempMax,
@@ -32,14 +30,6 @@ const WeatherCard = ({ weather }) => {
     sunset,
     timezone,
   } = weather;
-
-  console.log("🔍 WeatherCard destructured:", {
-    city,
-    country,
-    timezone,
-    hasTimezone: timezone !== undefined,
-    type: typeof timezone,
-  });
 
   // Extract nested weather data with fallbacks
   const condition = weatherData?.main || "Unknown";
@@ -54,66 +44,13 @@ const WeatherCard = ({ weather }) => {
   };
 
   const getCurrentTime = () => {
-    console.log("========== TIME CALCULATION START ==========");
-    console.log("1. Input timezone:", timezone);
-    console.log("2. City:", city);
-    console.log("3. Country:", country);
-
-    if (timezone === undefined || timezone === null) {
-      console.log("❌ No timezone, using local time");
-      const fallback = new Date();
-      return fallback.toLocaleTimeString([], {
+    if (!timezone)
+      return new Date().toLocaleTimeString([], {
         weekday: "long",
         hour: "2-digit",
         minute: "2-digit",
       });
-    }
-
-    const now = Date.now();
-    console.log("4. Current timestamp (ms):", now);
-    console.log("5. Local time:", new Date(now).toString());
-
-    const offset = new Date().getTimezoneOffset();
-    console.log("6. Local offset (minutes):", offset);
-    console.log("7. Local offset (ms):", offset * 60000);
-
-    const utcNow = now + offset * 60000;
-    console.log("8. UTC time (ms):", utcNow);
-    console.log("9. UTC time:", new Date(utcNow).toUTCString());
-
-    console.log("10. Timezone offset (seconds):", timezone);
-    console.log("11. Timezone offset (ms):", timezone * 1000);
-
-    const cityTimeMs = utcNow + timezone * 1000;
-    console.log("12. City time (ms):", cityTimeMs);
-
-    const cityTime = new Date(cityTimeMs);
-    console.log("13. City time (UTC):", cityTime.toUTCString());
-    console.log("14. City time (local):", cityTime.toString());
-    console.log("15. City getUTCHours():", cityTime.getUTCHours());
-    console.log("16. City getUTCMinutes():", cityTime.getUTCMinutes());
-
-    const days = [
-      "Sunday",
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-    ];
-    const dayName = days[cityTime.getUTCDay()];
-
-    const hours = cityTime.getUTCHours();
-    const minutes = cityTime.getUTCMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
-
-    const result = `${dayName} ${displayHours}:${minutes} ${ampm}`;
-    console.log("✅ FINAL TIME:", result);
-    console.log("========== TIME CALCULATION END ==========");
-
-    return result;
+    return getCurrentCityTime(timezone);
   };
 
   const getWindDirection = (degrees) => {

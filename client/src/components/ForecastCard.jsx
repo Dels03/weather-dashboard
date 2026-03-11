@@ -22,37 +22,14 @@ const ForecastCard = ({ forecast, isToday = false }) => {
   };
 
   const getCurrentTime = () => {
-    // Check for undefined or null, but allow 0 as valid
-    if (timezone === undefined || timezone === null) {
+    if (!timezone) {
       return new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
       });
     }
-
-    // CORRECTED CALCULATION
-    const now = new Date();
-
-    // Get current UTC time in milliseconds
-    const utc = Date.UTC(
-      now.getUTCFullYear(),
-      now.getUTCMonth(),
-      now.getUTCDate(),
-      now.getUTCHours(),
-      now.getUTCMinutes(),
-      now.getUTCSeconds(),
-    );
-
-    // Add timezone offset (timezone is in seconds, convert to ms)
-    const cityTime = new Date(utc + timezone * 1000);
-
-    const hours = cityTime.getUTCHours();
-    const minutes = cityTime.getUTCMinutes().toString().padStart(2, "0");
-    const ampm = hours >= 12 ? "PM" : "AM";
-    const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
-
-    return `${displayHours}:${minutes} ${ampm}`;
+    return formatCityTimeOnly(Date.now(), timezone);
   };
 
   // ============================================
