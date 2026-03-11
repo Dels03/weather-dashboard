@@ -102,15 +102,22 @@ const SearchBar = () => {
         getForecast(city.cityName, city.countryCode),
       ]);
 
-      // Transform the weather data to include city/country at root level
+      // Transform the weather data to include city/country/timezone at root level
       const transformedData = {
         ...weatherData.data,
         city: weatherData.data.apiResponse?.name,
         country: weatherData.data.apiResponse?.sys?.country,
+        timezone: weatherData.data.timezone,
       };
 
       setCurrentWeather(transformedData);
-      setForecast(forecastData.data);
+
+      // Add timezone to each forecast item
+      const forecastWithTimezone = forecastData.data.map((item) => ({
+        ...item,
+        timezone: transformedData.timezone,
+      }));
+      setForecast(forecastWithTimezone);
     } catch (error) {
       setError("Failed to fetch weather data. Please try again.");
       console.error("Weather fetch error:", error);
@@ -138,10 +145,17 @@ const SearchBar = () => {
         ...weatherData.data,
         city: weatherData.data.apiResponse?.name,
         country: weatherData.data.apiResponse?.sys?.country,
+        timezone: weatherData.data.timezone,
       };
 
       setCurrentWeather(transformedData);
-      setForecast(forecastData.data);
+
+      // Add timezone to each forecast item
+      const forecastWithTimezone = forecastData.data.map((item) => ({
+        ...item,
+        timezone: transformedData.timezone,
+      }));
+      setForecast(forecastWithTimezone);
     } catch (error) {
       setError("City not found. Please check the name and try again.");
       console.error("Weather fetch error:", error);
@@ -298,7 +312,6 @@ const SearchBar = () => {
                           {city.countryCode}
                         </p>
                       </div>
-                      {/* Quick weather preview (you can add this later) */}
                       <span className="text-xs text-white/20 group-hover:text-white/40 transition-colors">
                         ⚡
                       </span>

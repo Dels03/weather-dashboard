@@ -75,7 +75,7 @@ export const Visibility = ({ visibility = 0.4 }) => {
       {/* Visibility Value */}
       <div className="mb-3">
         <div className="text-4xl font-light text-white">
-          {typeof visibility === 'string' ? parseFloat(visibility) : visibility}
+          {typeof visibility === "string" ? parseFloat(visibility) : visibility}
           <span className="text-xl text-white/50 ml-1">km</span>
         </div>
         <div className="text-xs text-white/40 mt-1">{visData.level}</div>
@@ -84,7 +84,10 @@ export const Visibility = ({ visibility = 0.4 }) => {
       {/* Visual Indicator */}
       <div className="flex items-center gap-1 mb-3">
         {[1, 2, 3, 4, 5].map((level) => {
-          const visValue = typeof visibility === 'string' ? parseFloat(visibility) : visibility;
+          const visValue =
+            typeof visibility === "string"
+              ? parseFloat(visibility)
+              : visibility;
           return (
             <div
               key={level}
@@ -105,5 +108,3 @@ export const Visibility = ({ visibility = 0.4 }) => {
     </div>
   );
 };
-
-// No default export needed - we only use named exports

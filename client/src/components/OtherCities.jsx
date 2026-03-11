@@ -22,11 +22,11 @@ const OtherCities = ({ cities, onCityClick }) => {
     const now = new Date();
     const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
 
-    // Add the city's timezone offset (seconds to milliseconds)
+    // Add the city's timezone offset
     const cityTimeMs = utcTime + timezone * 1000;
     const cityDate = new Date(cityTimeMs);
 
-    // Format using UTC methods to avoid local conversion
+    // Format using UTC methods
     const hours = cityDate.getUTCHours();
     const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
     const ampm = hours >= 12 ? "PM" : "AM";

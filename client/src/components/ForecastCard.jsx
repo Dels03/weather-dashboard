@@ -22,14 +22,25 @@ const ForecastCard = ({ forecast, isToday = false }) => {
   };
 
   const getCurrentTime = () => {
-    if (!timezone) {
+    console.log(
+      "⏰ ForecastCard - timezone:",
+      timezone,
+      "type:",
+      typeof timezone,
+    );
+
+    if (timezone === undefined || timezone === null) {
+      console.log("⚠️ No timezone, using local time");
       return new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
         hour12: true,
       });
     }
-    return formatCityTimeOnly(Date.now(), timezone);
+
+    const result = formatCityTimeOnly(Date.now(), timezone);
+    console.log("✅ Calculated time:", result, "for timezone:", timezone);
+    return result;
   };
 
   // ============================================

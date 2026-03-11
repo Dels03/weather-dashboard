@@ -171,7 +171,7 @@ export const EmptyState = ({ onLocationClick }) => {
   );
 };
 
-// Add float animation to global CSS or component
+// Add float animation
 const style = document.createElement("style");
 style.textContent = `
   @keyframes float {

@@ -25,18 +25,34 @@ export const formatCityTime = (unixTimestamp, timezone, options = {}) => {
 };
 
 /**
- * Format a Unix timestamp to show only time
+ * Format a Unix timestamp to show only time - FIXED VERSION
  */
 export const formatCityTimeOnly = (unixTimestamp, timezone) => {
   if (!unixTimestamp) return "N/A";
 
-  const utcTime = new Date(unixTimestamp * 1000);
-  const cityDate = new Date(utcTime.getTime() + timezone * 1000);
+  // Get current time in UTC
+  const now = new Date();
+  const utcHours = now.getUTCHours();
+  const utcMinutes = now.getUTCMinutes();
 
-  const hours = cityDate.getUTCHours();
-  const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+  // Convert timezone from seconds to hours
+  const tzHours = timezone / 3600;
+
+  // Calculate city hours
+  let cityHours = utcHours + tzHours;
+  let cityMinutes = utcMinutes;
+
+  // Handle day rollover
+  if (cityHours >= 24) {
+    cityHours -= 24;
+  } else if (cityHours < 0) {
+    cityHours += 24;
+  }
+
+  // Format
+  const minutes = cityMinutes.toString().padStart(2, "0");
+  const ampm = cityHours >= 12 ? "PM" : "AM";
+  const displayHours = (cityHours % 12 || 12).toString().padStart(2, "0");
 
   return `${displayHours}:${minutes} ${ampm}`;
 };
@@ -88,7 +104,7 @@ export const formatCityDateTime = (unixTimestamp, timezone) => {
 };
 
 /**
- * Get current time in a specific city - FIXED VERSION
+ * Get current time in a specific city
  * @param {number} timezone - Timezone offset in seconds from UTC
  * @returns {string} Current time in city
  */
@@ -104,17 +120,26 @@ export const getCurrentCityTime = (timezone) => {
     });
   }
 
-  // Get current time
+  // Get current UTC time using simple math
   const now = new Date();
+  const utcHours = now.getUTCHours();
+  const utcMinutes = now.getUTCMinutes();
 
-  // Calculate UTC time CORRECTLY - same as OtherCities.jsx
-  const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+  // Convert timezone from seconds to hours
+  const tzHours = timezone / 3600;
 
-  // Add city's timezone offset
-  const cityTimeMs = utcTime + timezone * 1000;
-  const cityDate = new Date(cityTimeMs);
+  // Calculate city hours
+  let cityHours = utcHours + tzHours;
+  let cityMinutes = utcMinutes;
 
-  // Format using UTC methods
+  // Handle day rollover
+  if (cityHours >= 24) {
+    cityHours -= 24;
+  } else if (cityHours < 0) {
+    cityHours += 24;
+  }
+
+  // Get day of week
   const days = [
     "Sunday",
     "Monday",
@@ -124,12 +149,24 @@ export const getCurrentCityTime = (timezone) => {
     "Friday",
     "Saturday",
   ];
-  const dayName = days[cityDate.getUTCDay()];
 
-  const hours = cityDate.getUTCHours();
-  const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
-  const ampm = hours >= 12 ? "PM" : "AM";
-  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+  // Calculate day offset
+  let dayOffset = 0;
+  if (cityHours < utcHours && tzHours > 0) {
+    dayOffset = 1;
+  } else if (cityHours > utcHours && tzHours < 0) {
+    dayOffset = -1;
+  }
+
+  const utcDay = now.getUTCDay();
+  let cityDay = (utcDay + dayOffset + 7) % 7;
+
+  const dayName = days[cityDay];
+
+  // Format
+  const minutes = cityMinutes.toString().padStart(2, "0");
+  const ampm = cityHours >= 12 ? "PM" : "AM";
+  const displayHours = (cityHours % 12 || 12).toString().padStart(2, "0");
 
   return `${dayName} ${displayHours}:${minutes} ${ampm}`;
 };

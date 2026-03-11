@@ -36,8 +36,8 @@ const Dashboard = () => {
   } = useWeather();
 
   // Debug logs
-  console.log("📊 forecast data:", forecast);
-  console.log("🌤️ currentWeather data:", currentWeather);
+  console.log(" forecast data:", forecast);
+  console.log(" currentWeather data:", currentWeather);
 
   const [activeTab, setActiveTab] = useState("next7days");
   const [showFavorites, setShowFavorites] = useState(true);
@@ -243,26 +243,26 @@ const Dashboard = () => {
               >
                 {/* Wind Status - Takes 2 cols on lg */}
                 <div className="sm:col-span-2 lg:col-span-2">
-                  {console.log("💨 Wind data:", currentWeather?.wind)}
+                  {console.log(" Wind data:", currentWeather?.wind)}
                   <WindStatus windData={currentWeather?.wind} />
                 </div>
 
                 {/* UV Index */}
                 <div>
-                  {console.log("☀️ UV Index (mock):", 5.5)}
+                  {console.log(" UV Index (mock):", 5.5)}
                   <UVIndex uvIndex={5.5} />
                 </div>
 
                 {/* Humidity */}
                 <div>
-                  {console.log("💧 Humidity:", currentWeather?.humidity)}
+                  {console.log(" Humidity:", currentWeather?.humidity)}
                   <Humidity humidity={currentWeather?.humidity || 84} />
                 </div>
 
                 {/* Visibility */}
                 <div>
                   {console.log(
-                    "👁️ Visibility raw:",
+                    " Visibility raw:",
                     currentWeather?.visibility,
                   )}
                   <Visibility
@@ -287,7 +287,7 @@ const Dashboard = () => {
                     Global Map
                   </h3>
                   <button className="text-xs text-white/40 hover:text-white/60 transition-colors">
-                    View wide →
+                    View wide 
                   </button>
                 </div>
                 <div className="rounded-xl overflow-hidden">

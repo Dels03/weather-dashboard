@@ -4,7 +4,7 @@ import { Droplets, CloudRain, Info } from "lucide-react";
 const PrecipitationChart = ({ forecast }) => {
   const [hoveredIndex, setHoveredIndex] = useState(null);
 
-  // Mock data - replace with actual hourly precipitation data from your API
+  // Mock data - replace with actual hourly precipitation data from API
   const hours = ["12AM", "3AM", "6AM", "9AM", "12PM", "3PM", "6PM", "9PM"];
   const precipitation = [20, 45, 80, 60, 30, 70, 90, 40]; // Percentage
 
