@@ -16,18 +16,43 @@ const app = express();
 app.use(helmet());
 app.use(compression());
 
-// CORS configuration
-app.use(cors({
-  origin: [
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-    process.env.CLIENT_URL,
-  ].filter(Boolean),
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With", "Accept"],
-  optionsSuccessStatus: 200,
-}));
+// CORS configuration - Updated to accept any Vercel subdomain
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps, curl, etc)
+      if (!origin) return callback(null, true);
+
+      // List of allowed origins
+      const allowedOrigins = [
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        process.env.CLIENT_URL,
+      ].filter(Boolean);
+
+      // Check if origin is in allowed list
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        return callback(null, true);
+      }
+
+      // Allow any Vercel app subdomain
+      if (origin.includes(".vercel.app")) {
+        return callback(null, true);
+      }
+
+      callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+      "Content-Type",
+      "Authorization",
+      "X-Requested-With",
+      "Accept",
+    ],
+    optionsSuccessStatus: 200,
+  }),
+);
 
 // Rate limiting
 const limiter = rateLimit({
@@ -46,7 +71,11 @@ app.use(morgan("dev"));
 
 // Test endpoints
 app.get("/api/test", (req, res) => {
-  res.json({ success: true, message: "API test endpoint working!", timestamp: new Date() });
+  res.json({
+    success: true,
+    message: "API test endpoint working!",
+    timestamp: new Date(),
+  });
 });
 
 app.get("/api/test-cors", (req, res) => {
@@ -68,7 +97,13 @@ app.get("/health", (req, res) => {
 
 // 404 handler
 app.use((req, res) => {
-  res.status(404).json({ success: false, message: "Route not found", path: req.originalUrl });
+  res
+    .status(404)
+    .json({
+      success: false,
+      message: "Route not found",
+      path: req.originalUrl,
+    });
 });
 
 // Error handling middleware
@@ -77,7 +112,10 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({
     success: false,
     message: err.message || "Internal Server Error",
-    error: process.env.NODE_ENV === "development" ? { message: err.message, stack: err.stack } : {},
+    error:
+      process.env.NODE_ENV === "development"
+        ? { message: err.message, stack: err.stack }
+        : {},
   });
 });
 
@@ -86,7 +124,7 @@ let cachedDb = null;
 
 async function connectToDatabase() {
   if (cachedDb) return cachedDb;
-  
+
   try {
     const connection = await mongoose.connect(process.env.MONGODB_URI);
     cachedDb = connection;
@@ -99,14 +137,18 @@ async function connectToDatabase() {
 }
 
 // Wrap routes to ensure DB connection
-app.use("/api/weather", async (req, res, next) => {
-  try {
-    await connectToDatabase();
-    next();
-  } catch (error) {
-    res.status(500).json({ error: "Database connection failed" });
-  }
-}, weatherRoutes);
+app.use(
+  "/api/weather",
+  async (req, res, next) => {
+    try {
+      await connectToDatabase();
+      next();
+    } catch (error) {
+      res.status(500).json({ error: "Database connection failed" });
+    }
+  },
+  weatherRoutes,
+);
 
 // Export for Vercel serverless
 module.exports = app;
