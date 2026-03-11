@@ -3,11 +3,16 @@ import { MapPin, RefreshCw } from "lucide-react";
 import { useWeather } from "../context/WeatherContext";
 import ForecastList from "../components/ForecastList";
 import PrecipitationChart from "../components/PrecipitationChart";
+import WindStatus from "../components/WindStatus";
+import UVIndex from "../components/UVIndex";
+import OtherCities from "../components/OtherCities";
+import { Humidity, Visibility } from "../components/WeatherDetails";
 import FavoritesList from "../components/FavoritesList";
 import EmptyState from "../components/EmptyState";
 import WeatherMap from "../components/WeatherMap";
 import { getWeather, getForecast } from "../services/weatherApi";
 
+// Major world cities to display
 const MAJOR_CITIES = [
   { name: "New York", country: "US", id: "new-york" },
   { name: "London", country: "GB", id: "london" },
@@ -29,6 +34,11 @@ const Dashboard = () => {
     setForecast,
     setLoading,
   } = useWeather();
+
+  // Debug logs
+  console.log("📊 forecast data:", forecast);
+  console.log("🌤️ currentWeather data:", currentWeather);
+
   const [activeTab, setActiveTab] = useState("next7days");
   const [showFavorites, setShowFavorites] = useState(true);
   const [otherCities, setOtherCities] = useState([]);
@@ -36,6 +46,7 @@ const Dashboard = () => {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
 
+  // Fetch major cities weather on mount
   useEffect(() => {
     fetchMajorCitiesWeather();
   }, []);
@@ -55,23 +66,10 @@ const Dashboard = () => {
             id: city.id,
             country: weatherData.apiResponse?.sys?.country || city.country,
             city: weatherData.apiResponse?.name || city.name,
-            condition: weatherData.weather?.main || "Unknown",
-            description: weatherData.weather?.description || "",
-            temperature: weatherData.temperature,
-            feelsLike: weatherData.feelsLike,
-            humidity: weatherData.humidity,
-            windSpeed: weatherData.wind?.speed || 0,
-            windDirection: weatherData.wind?.direction || 0,
-            icon: getWeatherIcon(weatherData.weather?.icon),
-            iconCode: weatherData.weather?.icon,
-            coordinates: weatherData.coordinates,
-            sunrise: weatherData.sunrise,
-            sunset: weatherData.sunset,
-            pressure: weatherData.pressure,
-            visibility: weatherData.visibility,
+            condition: weatherData.weather?.description || "Unknown",
+            temperature: Math.round(weatherData.temperature),
+            icon: getWeatherIconType(weatherData.weather?.icon),
             timezone: weatherData.timezone,
-            tempMin: weatherData.tempMin,
-            tempMax: weatherData.tempMax,
             apiName: city.name,
             apiCountry: city.country,
           });
@@ -87,21 +85,18 @@ const Dashboard = () => {
     setLastUpdated(new Date());
   };
 
-  const getWeatherIcon = (iconCode) => {
-    if (!iconCode) return "☀️";
+  // Helper to get icon type for OtherCities component
+  const getWeatherIconType = (iconCode) => {
+    if (!iconCode) return "sun";
     const code = iconCode.substring(0, 2);
-    if (code === "01") return "☀️";
-    if (code === "02") return "⛅";
-    if (code === "03") return "☁️";
-    if (code === "04") return "☁️";
-    if (code === "09") return "️";
-    if (code === "10") return "️";
-    if (code === "11") return "⛈️";
-    if (code === "13") return "❄️";
-    if (code === "50") return "️";
-    return "☀️";
+    if (code === "01") return "sun";
+    if (code === "02" || code === "03" || code === "04") return "cloud";
+    if (code === "09" || code === "10") return "rain";
+    if (code === "13") return "snow";
+    return "cloud";
   };
 
+  // Handle click on a major city
   const handleCityClick = async (city) => {
     if (
       currentWeather?.city === city.city &&
@@ -118,8 +113,9 @@ const Dashboard = () => {
           ...weatherResponse.data,
           city: weatherResponse.data?.apiResponse?.name,
           country: weatherResponse.data?.apiResponse?.sys?.country,
+          timezone: weatherResponse.data?.timezone,
         };
-        
+
         setCurrentWeather(transformedData);
 
         const forecastResponse = await getForecast(
@@ -127,7 +123,12 @@ const Dashboard = () => {
           city.apiCountry,
         );
         if (forecastResponse.success) {
-          setForecast(forecastResponse.data);
+          // Add timezone from current weather to each forecast item
+          const forecastWithTimezone = forecastResponse.data.map((item) => ({
+            ...item,
+            timezone: transformedData.timezone,
+          }));
+          setForecast(forecastWithTimezone);
         }
       }
     } catch (error) {
@@ -144,31 +145,19 @@ const Dashboard = () => {
     setRefreshing(false);
   };
 
-  const CitySkeleton = () => (
-    <div className="bg-white/5 rounded-2xl p-4 animate-pulse">
-      <div className="flex items-start justify-between">
-        <div className="space-y-2 flex-1">
-          <div className="h-4 bg-white/10 rounded w-16"></div>
-          <div className="h-6 bg-white/10 rounded w-24"></div>
-          <div className="h-3 bg-white/10 rounded w-20"></div>
-        </div>
-        <div className="w-12 h-12 bg-white/10 rounded-full"></div>
-      </div>
-    </div>
-  );
-
   return (
     <div className="min-h-screen bg-[#0a0a0a] text-white">
-      <main className="p-6">
+      <main className="p-4 sm:p-6">
+        {/* Tabs */}
         <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-4 sm:space-x-6">
             {["today", "tomorrow", "next7days"].map((tab) => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
-                className={`text-sm transition-all relative ${
+                className={`text-xs sm:text-sm transition-all relative ${
                   activeTab === tab
-                    ? "text-white"
+                    ? "text-white font-medium"
                     : "text-white/50 hover:text-white"
                 }`}
               >
@@ -176,22 +165,25 @@ const Dashboard = () => {
                   ? "Next 7 days"
                   : tab.charAt(0).toUpperCase() + tab.slice(1)}
                 {activeTab === tab && (
-                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-full"></span>
+                  <span className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r from-[#4A90E2] to-[#5BA3F5] rounded-full"></span>
                 )}
               </button>
             ))}
           </div>
 
           {lastUpdated && (
-            <div className="flex items-center gap-4">
+            <div className="hidden sm:flex items-center gap-3">
               <span className="text-xs text-white/30">
-                Updated {lastUpdated.toLocaleTimeString()}
+                {lastUpdated.toLocaleTimeString([], {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
               </span>
               <button
                 onClick={handleRefresh}
                 disabled={refreshing}
-                className="p-2 bg-white/5 hover:bg-white/10 rounded-xl transition-all disabled:opacity-50"
-                title="Refresh cities"
+                className="p-2 bg-white/[0.03] hover:bg-white/[0.06] rounded-xl transition-all disabled:opacity-50 border border-white/[0.08]"
+                title="Refresh"
               >
                 <RefreshCw
                   className={`w-4 h-4 text-white/40 ${refreshing ? "animate-spin" : ""}`}
@@ -201,158 +193,145 @@ const Dashboard = () => {
           )}
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 lg:col-span-8 space-y-6">
-            {showFavorites && (
-              <div className="animate-slide-down">
-                <FavoritesList />
-              </div>
-            )}
+        {/* Favorites */}
+        {showFavorites && !loading && (
+          <div className="mb-6 animate-fade-in-up">
+            <FavoritesList />
+          </div>
+        )}
 
-            {error && (
-              <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl flex items-center gap-3">
-                <div className="w-1 h-8 bg-red-500/50 rounded-full"></div>
-                <p>{error}</p>
-              </div>
-            )}
+        {/* Error Message */}
+        {error && (
+          <div className="mb-6 bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-xl flex items-center gap-3">
+            <div className="w-1 h-8 bg-red-500/50 rounded-full"></div>
+            <p>{error}</p>
+          </div>
+        )}
 
-            {loading && (
-              <div className="bg-white/5 rounded-3xl p-12 text-center border border-white/10">
-                <div className="relative w-20 h-20 mx-auto">
-                  <div className="absolute inset-0 border-4 border-blue-500/20 rounded-full"></div>
-                  <div className="absolute inset-0 border-4 border-t-blue-500 rounded-full animate-spin"></div>
-                </div>
-                <p className="mt-4 text-white/60">Loading weather data...</p>
-              </div>
-            )}
+        {/* Loading State */}
+        {loading && (
+          <div className="bg-white/[0.03] rounded-3xl p-12 text-center border border-white/[0.08] mb-6">
+            <div className="relative w-16 h-16 mx-auto">
+              <div className="absolute inset-0 border-4 border-[#4A90E2]/20 rounded-full"></div>
+              <div className="absolute inset-0 border-4 border-t-[#4A90E2] rounded-full animate-spin"></div>
+            </div>
+            <p className="mt-4 text-white/60 text-sm">Loading weather...</p>
+          </div>
+        )}
 
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-12 gap-4 sm:gap-6">
+          {/* LEFT SECTION - 8 cols on desktop */}
+          <div className="col-span-12 lg:col-span-8 space-y-4 sm:space-y-6">
+            {/* Forecast Cards Row */}
             {!loading && forecast && forecast.length > 0 && (
               <div className="animate-fade-in-up">
                 <ForecastList forecast={forecast} />
               </div>
             )}
 
-            {!loading && !error && !currentWeather && <EmptyState />}
-
-            <div className="bg-white/5 rounded-3xl p-6 border border-white/10 hover:border-white/20 transition-all group">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-6 bg-gradient-to-b from-blue-500 to-purple-500 rounded-full"></div>
-                  <h3 className="text-lg font-semibold">Global Map</h3>
-                </div>
-                <button
-                  onClick={() => {}}
-                  className="text-sm text-white/40 hover:text-white/60 transition-colors flex items-center gap-1"
-                >
-                  Reset view <span className="text-lg">↺</span>
-                </button>
-              </div>
-              <WeatherMap height="320px" />
-            </div>
-          </div>
-
-          <div className="col-span-12 lg:col-span-4 space-y-6">
-            <div className="flex items-center space-x-2 bg-white/5 rounded-xl p-1 border border-white/10">
-              <button className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg py-2 text-sm font-medium shadow-lg">
-                Forecast
-              </button>
-              <button className="flex-1 text-white/60 hover:text-white rounded-lg py-2 text-sm font-medium transition-colors">
-                Air quality
-              </button>
-            </div>
-
-            {forecast && forecast.length > 0 && (
-              <PrecipitationChart forecast={forecast} />
+            {/* Empty State */}
+            {!loading && !error && !currentWeather && !forecast?.length && (
+              <EmptyState />
             )}
 
-            <div className="bg-white/5 rounded-3xl p-6 border border-white/10">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-1 h-6 bg-gradient-to-b from-yellow-400 to-orange-500 rounded-full"></div>
-                  <h3 className="text-sm font-semibold">Major Cities</h3>
-                  <span className="text-[10px] text-white/30 bg-white/5 px-2 py-0.5 rounded-full">
-                    Live
-                  </span>
+            {/* Bottom Grid - Wind, UV, Humidity, Visibility */}
+            {!loading && currentWeather && (
+              <div
+                className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 animate-fade-in-up"
+                style={{ animationDelay: "0.1s" }}
+              >
+                {/* Wind Status - Takes 2 cols on lg */}
+                <div className="sm:col-span-2 lg:col-span-2">
+                  {console.log("💨 Wind data:", currentWeather?.wind)}
+                  <WindStatus windData={currentWeather?.wind} />
                 </div>
-                <button
-                  onClick={handleRefresh}
-                  disabled={refreshing}
-                  className="text-xs text-white/40 hover:text-white/60 transition-colors flex items-center gap-1"
-                >
-                  <RefreshCw
-                    className={`w-3 h-3 ${refreshing ? "animate-spin" : ""}`}
+
+                {/* UV Index */}
+                <div>
+                  {console.log("☀️ UV Index (mock):", 5.5)}
+                  <UVIndex uvIndex={5.5} />
+                </div>
+
+                {/* Humidity */}
+                <div>
+                  {console.log("💧 Humidity:", currentWeather?.humidity)}
+                  <Humidity humidity={currentWeather?.humidity || 84} />
+                </div>
+
+                {/* Visibility */}
+                <div>
+                  {console.log(
+                    "👁️ Visibility raw:",
+                    currentWeather?.visibility,
+                  )}
+                  <Visibility
+                    visibility={
+                      currentWeather?.visibility
+                        ? (currentWeather.visibility / 1000).toFixed(1)
+                        : 0.4
+                    }
                   />
-                  Refresh
-                </button>
+                </div>
               </div>
+            )}
 
-              <div className="space-y-2 max-h-[500px] overflow-y-auto pr-1 custom-scrollbar">
-                {loadingCities &&
-                Object.values(loadingCities).some(Boolean) &&
-                otherCities.length === 0
-                  ? Array(5)
-                      .fill(0)
-                      .map((_, i) => <CitySkeleton key={i} />)
-                  : otherCities.map((city) => (
-                      <div
-                        key={city.id}
-                        onClick={() => handleCityClick(city)}
-                        className="group relative bg-white/5 hover:bg-white/10 rounded-2xl p-4 transition-all cursor-pointer border border-white/10 hover:border-white/20"
-                      >
-                        <div className="absolute inset-0 bg-gradient-to-r from-blue-500/0 via-purple-500/0 to-pink-500/0 group-hover:from-blue-500/5 group-hover:via-purple-500/5 group-hover:to-pink-500/5 rounded-2xl transition-all"></div>
-
-                        <div className="relative z-10">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex items-center gap-1">
-                              <MapPin className="w-3 h-3 text-white/30" />
-                              <span className="text-xs text-white/40">
-                                {city.country}
-                              </span>
-                            </div>
-                            <div className="text-xs text-white/30">Now</div>
-                          </div>
-
-                          <div className="flex items-center justify-between mb-2">
-                            <div>
-                              <div className="font-medium group-hover:text-blue-400 transition-colors text-lg">
-                                {city.city}
-                              </div>
-                              <div className="text-xs text-white/40 mt-0.5">
-                                {city.condition || "..."}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <div className="text-3xl filter drop-shadow-lg">
-                                {city.icon}
-                              </div>
-                              <div className="text-2xl font-light text-white">
-                                {city.temperature}°
-                              </div>
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4 mt-3 pt-2 border-t border-white/5">
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-white/30"></span>
-                              <span className="text-xs text-white/60">
-                                {city.humidity}%
-                              </span>
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-xs text-white/30"></span>
-                              <span className="text-xs text-white/60">
-                                {city.windSpeed} km/h
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
+            {/* Global Map */}
+            {!loading && (
+              <div
+                className="bg-white/[0.03] rounded-2xl p-5 border border-white/[0.08] hover:border-white/[0.12] transition-all animate-fade-in-up"
+                style={{ animationDelay: "0.2s" }}
+              >
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-sm font-semibold text-white">
+                    Global Map
+                  </h3>
+                  <button className="text-xs text-white/40 hover:text-white/60 transition-colors">
+                    View wide →
+                  </button>
+                </div>
+                <div className="rounded-xl overflow-hidden">
+                  <WeatherMap height="280px" />
+                </div>
               </div>
+            )}
+          </div>
 
-              <button className="w-full mt-4 py-2 text-xs text-white/30 hover:text-white/50 transition-colors border-t border-white/5">
-                View all cities →
+          {/* RIGHT SECTION - 4 cols on desktop */}
+          <div className="col-span-12 lg:col-span-4 space-y-4 sm:space-y-6">
+            {/* Forecast/Air Quality Toggle - Air Quality disabled */}
+            <div className="flex items-center space-x-2 bg-white/[0.03] rounded-xl p-1 border border-white/[0.08]">
+              <button className="flex-1 bg-gradient-to-r from-[#4A90E2] to-[#5BA3F5] text-white rounded-lg py-2 text-sm font-medium shadow-lg">
+                Forecast
               </button>
+              <button
+                disabled
+                className="flex-1 text-white/30 rounded-lg py-2 text-sm font-medium cursor-not-allowed relative group"
+                title="Air quality data coming soon"
+              >
+                Air quality
+                <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-black/80 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap">
+                  Coming soon
+                </span>
+              </button>
+            </div>
+
+            {/* Precipitation Chart */}
+            {forecast && forecast.length > 0 && (
+              <div
+                className="animate-fade-in-up"
+                style={{ animationDelay: "0.1s" }}
+              >
+                <PrecipitationChart forecast={forecast} />
+              </div>
+            )}
+
+            {/* Other Cities */}
+            <div
+              className="animate-fade-in-up"
+              style={{ animationDelay: "0.15s" }}
+            >
+              <OtherCities cities={otherCities} onCityClick={handleCityClick} />
             </div>
           </div>
         </div>

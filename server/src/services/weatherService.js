@@ -269,6 +269,7 @@ class WeatherService {
           temps: [],
           weathers: [],
           items: [],
+          pops: [], // ADD THIS LINE - store precipitation probabilities
         });
       }
 
@@ -276,12 +277,16 @@ class WeatherService {
       dayData.temps.push(item.main.temp);
       dayData.weathers.push(item.weather[0]);
       dayData.items.push(item);
+      dayData.pops.push(item.pop || 0); // ADD THIS LINE - collect pop values
     });
 
     // Calculate daily aggregates
     forecastMap.forEach((value) => {
       const tempHigh = Math.max(...value.temps);
       const tempLow = Math.min(...value.temps);
+
+      // Calculate average pop for the day
+      const avgPop = value.pops.reduce((a, b) => a + b, 0) / value.pops.length;
 
       // Get most frequent weather condition
       const weatherCounts = {};
@@ -305,6 +310,7 @@ class WeatherService {
         icon: representativeWeather.icon,
         humidity: value.items[0].main.humidity,
         windSpeed: value.items[0].wind.speed,
+        pop: avgPop, // ADD THIS LINE - include pop in the response
       });
     });
 

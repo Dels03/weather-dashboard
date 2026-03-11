@@ -12,7 +12,6 @@ export const formatCityTime = (unixTimestamp, timezone, options = {}) => {
   const utcTime = new Date(unixTimestamp * 1000);
 
   // Calculate city's local time using timezone offset
-  // OpenWeather returns timezone in seconds from UTC
   const localTime = new Date(utcTime.getTime() + timezone * 1000);
 
   const defaultOptions = {
@@ -29,43 +28,108 @@ export const formatCityTime = (unixTimestamp, timezone, options = {}) => {
  * Format a Unix timestamp to show only time
  */
 export const formatCityTimeOnly = (unixTimestamp, timezone) => {
-  return formatCityTime(unixTimestamp, timezone, {
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  if (!unixTimestamp) return "N/A";
+
+  const utcTime = new Date(unixTimestamp * 1000);
+  const cityDate = new Date(utcTime.getTime() + timezone * 1000);
+
+  const hours = cityDate.getUTCHours();
+  const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+
+  return `${displayHours}:${minutes} ${ampm}`;
 };
 
 /**
  * Format a Unix timestamp to show full date and time
  */
 export const formatCityDateTime = (unixTimestamp, timezone) => {
-  return formatCityTime(unixTimestamp, timezone, {
-    weekday: "long",
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  if (!unixTimestamp) return "N/A";
+
+  const utcTime = new Date(unixTimestamp * 1000);
+  const cityDate = new Date(utcTime.getTime() + timezone * 1000);
+
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+
+  const dayName = days[cityDate.getUTCDay()];
+  const monthName = months[cityDate.getUTCMonth()];
+  const day = cityDate.getUTCDate();
+  const year = cityDate.getUTCFullYear();
+
+  const hours = cityDate.getUTCHours();
+  const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+
+  return `${dayName}, ${monthName} ${day}, ${year} at ${displayHours}:${minutes} ${ampm}`;
 };
 
 /**
- * Get current time in a specific city
+ * Get current time in a specific city - FIXED VERSION
  * @param {number} timezone - Timezone offset in seconds from UTC
  * @returns {string} Current time in city
  */
 export const getCurrentCityTime = (timezone) => {
-  const now = new Date();
-  // Get current UTC time in milliseconds, add timezone offset
-  const utcNow = Date.now() + now.getTimezoneOffset() * 60000;
-  const cityTime = new Date(utcNow + timezone * 1000);
+  // Handle missing timezone
+  if (timezone === undefined || timezone === null) {
+    const now = new Date();
+    return now.toLocaleTimeString("en-US", {
+      weekday: "long",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: true,
+    });
+  }
 
-  return cityTime.toLocaleTimeString("en-US", {
-    weekday: "long",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: true,
-  });
+  // Get current time
+  const now = new Date();
+
+  // Calculate UTC time CORRECTLY - same as OtherCities.jsx
+  const utcTime = now.getTime() + now.getTimezoneOffset() * 60000;
+
+  // Add city's timezone offset
+  const cityTimeMs = utcTime + timezone * 1000;
+  const cityDate = new Date(cityTimeMs);
+
+  // Format using UTC methods
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const dayName = days[cityDate.getUTCDay()];
+
+  const hours = cityDate.getUTCHours();
+  const minutes = cityDate.getUTCMinutes().toString().padStart(2, "0");
+  const ampm = hours >= 12 ? "PM" : "AM";
+  const displayHours = (hours % 12 || 12).toString().padStart(2, "0");
+
+  return `${dayName} ${displayHours}:${minutes} ${ampm}`;
 };

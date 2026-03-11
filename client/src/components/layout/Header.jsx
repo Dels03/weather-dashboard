@@ -29,13 +29,14 @@ const Header = ({ showFavorites, setShowFavorites }) => {
     if (currentWeather) {
       const newNotifications = [];
 
+      // Weather alert notifications
       if (currentWeather.condition?.toLowerCase().includes("rain")) {
         newNotifications.push({
           id: "rain",
           title: "Rain Expected",
           message: `Don't forget your umbrella in ${currentWeather.city}!`,
           time: "Just now",
-          icon: "ï¸",
+          icon: "í¼§ï¸",
         });
       }
 
@@ -45,7 +46,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "High Temperature",
           message: `It's ${Math.round(currentWeather.temperature)}Â°C in ${currentWeather.city}. Stay hydrated!`,
           time: "Just now",
-          icon: "",
+          icon: "í´¥",
         });
       }
 
@@ -65,7 +66,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Windy Conditions",
           message: `Strong winds (${Math.round(currentWeather.windSpeed)} km/h) in ${currentWeather.city}.`,
           time: "Just now",
-          icon: "",
+          icon: "í²¨",
         });
       }
 
@@ -83,6 +84,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
       <div className="flex items-center justify-between">
         {/* Left Section */}
         <div className="flex items-center space-x-4">
+          {/* Grid Icon - Navigate to Home */}
           <button
             onClick={() => navigate("/")}
             className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all group"
@@ -91,6 +93,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
             <Grid className="w-5 h-5 text-white/40 group-hover:text-white/60" />
           </button>
 
+          {/* Bell Icon - Notifications */}
           <div className="relative">
             <button
               onClick={() => setShowNotifications(!showNotifications)}
@@ -105,6 +108,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
               )}
             </button>
 
+            {/* Notifications Dropdown */}
             {showNotifications && (
               <div className="absolute top-12 left-0 w-80 glass-card p-3 animate-fade-in-up">
                 <div className="flex items-center justify-between mb-3">
@@ -152,6 +156,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
             )}
           </div>
 
+          {/* Current Location - SIMPLIFIED: just display, not clickable */}
           <div className="flex items-center space-x-2 px-4 py-2 bg-white/5 rounded-xl border border-white/10">
             <MapPin className="w-4 h-4 text-blue-400" />
             <span className="text-sm font-medium">
@@ -162,9 +167,12 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           </div>
         </div>
 
+        {/* Center - Search Bar */}
         <SearchBar />
 
+        {/* Right Section */}
         <div className="flex items-center space-x-3">
+          {/* Favorites Button */}
           <button
             onClick={() => {
               setShowFavorites(!showFavorites);
@@ -177,6 +185,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
             <span className="absolute -top-1 -right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
           </button>
 
+          {/* Settings Button */}
           <button
             onClick={() => navigate("/settings")}
             className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all group"
@@ -185,6 +194,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
             <Settings className="w-4 h-4 text-white/40 group-hover:text-white/60" />
           </button>
 
+          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             className="w-10 h-10 bg-white/5 hover:bg-white/10 rounded-xl flex items-center justify-center transition-all group"
@@ -197,6 +207,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
             )}
           </button>
 
+          {/* Dashboard Button */}
           <div
             onClick={() => navigate("/dashboard")}
             className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center text-white font-semibold cursor-pointer hover:scale-105 transition-transform"
