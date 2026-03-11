@@ -36,7 +36,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Rain Expected",
           message: `Don't forget your umbrella in ${currentWeather.city}!`,
           time: "Just now",
-          icon: "í¼§ï¸",
+          icon: "ï¸",
         });
       }
 
@@ -46,7 +46,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "High Temperature",
           message: `It's ${Math.round(currentWeather.temperature)}Â°C in ${currentWeather.city}. Stay hydrated!`,
           time: "Just now",
-          icon: "í´¥",
+          icon: "",
         });
       }
 
@@ -66,7 +66,7 @@ const Header = ({ showFavorites, setShowFavorites }) => {
           title: "Windy Conditions",
           message: `Strong winds (${Math.round(currentWeather.windSpeed)} km/h) in ${currentWeather.city}.`,
           time: "Just now",
-          icon: "í²¨",
+          icon: "",
         });
       }
 
