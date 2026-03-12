@@ -55,7 +55,43 @@ export const getForecast = async (city, country = null) => {
   }
 };
 
-// New function to get weather by coordinates (useful for geolocation)
+/**
+ * Get UV Index data for a city
+ * @param {string} city - City name
+ * @param {string} country - Optional country code
+ * @returns {Promise<Object>} UV Index data including current, hourly, and daily
+ */
+export const getUVIndex = async (city, country = null) => {
+  try {
+    const response = await api.get("/weather/uv-index", {
+      params: { city, country },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Get UV Index error:", error);
+    throw error;
+  }
+};
+
+/**
+ * Get air quality data for a city
+ * @param {string} city - City name
+ * @param {string} country - Optional country code
+ * @returns {Promise<Object>} Air quality data including AQI and pollutants
+ */
+export const getAirQuality = async (city, country = null) => {
+  try {
+    const response = await api.get("/weather/air-quality", {
+      params: { city, country },
+    });
+    return response.data;
+  } catch (error) {
+    console.error("Get air quality error:", error);
+    throw error;
+  }
+};
+
+// Function to get weather by coordinates (useful for geolocation)
 export const getWeatherByCoords = async (lat, lon) => {
   try {
     // First, reverse geocode to get city name

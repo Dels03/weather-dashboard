@@ -80,7 +80,6 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Fix pre-save middleware
 userSchema.pre("save", function () {
   this.updatedAt = Date.now();
 });

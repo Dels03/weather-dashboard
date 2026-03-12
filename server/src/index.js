@@ -10,13 +10,13 @@ require("dotenv").config();
 // Import routes
 const weatherRoutes = require("./routes/weather.routes");
 
-const app = express(); // <-- This was missing!
+const app = express();
 
 // Security middleware
 app.use(helmet());
 app.use(compression());
 
-// =============== CORS CONFIGURATION ===============
+// CORS configuration
 const corsOptions = {
   origin: [
     "http://localhost:5173",
@@ -36,7 +36,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 
-// Handle preflight requests - FIXED VERSION (no wildcard *)
+// Handle preflight requests
 app.use((req, res, next) => {
   if (req.method === "OPTIONS") {
     res.header(
@@ -57,7 +57,6 @@ app.use((req, res, next) => {
   }
   next();
 });
-// =============== END CORS CONFIGURATION ===============
 
 // Rate limiting
 const limiter = rateLimit({
@@ -74,7 +73,7 @@ app.use(express.urlencoded({ extended: true }));
 // Logging
 app.use(morgan("dev"));
 
-// =============== TEST ENDPOINTS ===============
+// Test endpoints
 app.get("/api/test", (req, res) => {
   res.json({
     success: true,
@@ -91,7 +90,6 @@ app.get("/api/test-cors", (req, res) => {
     timestamp: new Date(),
   });
 });
-// =============== END TEST ENDPOINTS ===============
 
 // Routes
 app.use("/api/weather", weatherRoutes);
@@ -101,7 +99,7 @@ app.get("/health", (req, res) => {
   res.status(200).json({ status: "OK", timestamp: new Date() });
 });
 
-// 404 handler - FIXED VERSION (no wildcard *)
+// 404 handler
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -127,9 +125,9 @@ app.use((err, req, res, next) => {
 const connectDB = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log("✅ MongoDB connected successfully");
+    console.log("MongoDB connected successfully");
   } catch (error) {
-    console.error("❌ MongoDB connection error:", error);
+    console.error("MongoDB connection error:", error);
     process.exit(1);
   }
 };
@@ -138,9 +136,9 @@ connectDB();
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-  console.log(`✅ Server running on port ${PORT}`);
-  console.log(`🌐 CORS enabled for: http://localhost:5173`);
-  console.log(`🔧 Test endpoints:`);
+  console.log(`Server running on port ${PORT}`);
+  console.log(`CORS enabled for: http://localhost:5173`);
+  console.log(`Test endpoints:`);
   console.log(`   - http://localhost:${PORT}/api/test`);
   console.log(`   - http://localhost:${PORT}/api/test-cors`);
   console.log(`   - http://localhost:${PORT}/health`);

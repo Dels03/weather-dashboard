@@ -2,12 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>client</title>
+
+    <!-- Viewport configuration for responsive design -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=5.0"
+    />
+
+    <!-- Favicon - Weather emoji from your app -->
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' x='0' font-size='90'>☀️</text></svg>"
+    />
+    <link
+      rel="apple-touch-icon"
+      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='90' x='0' font-size='90'>☀️</text></svg>"
+    />
+
+    <!-- ============================================
+       PRIMARY META TAGS - FALLBACK FOR SEO
+       ============================================ -->
+
+    <!-- Basic Meta Tags -->
+    <title>Weather Dashboard | Real-time Weather & 5-Day Forecast</title>
+    <!-- ... rest of your meta tags ... -->
   </head>
   <body>
+    <!-- Root element for React app -->
     <div id="root"></div>
+
+    <!-- Entry point - Vite injects the built JS here -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

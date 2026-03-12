@@ -5,6 +5,8 @@ const weatherController = require("../controllers/weather.controller");
 // Weather API endpoints
 router.get("/current", weatherController.getCurrentWeather);
 router.get("/forecast", weatherController.getForecast);
+router.get("/air-quality", weatherController.getAirQuality);
+router.get("/uv-index", weatherController.getUVIndex); // New UV Index endpoint
 router.get("/search", weatherController.searchCities);
 
 // Test endpoints

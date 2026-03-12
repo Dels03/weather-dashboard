@@ -83,12 +83,14 @@ const WeatherCard = ({ weather }) => {
           <div className="flex justify-between items-start mb-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
-                <MapPin className="w-5 h-5 text-gray-800/60" />
-                <h2 className="text-2xl font-bold text-gray-800">
+                <MapPin className="w-5 h-5 text-gray-800/60 dark:text-gray-800/60 light:text-gray-800/60" />
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-800 light:text-gray-800">
                   {city}, {country}
                 </h2>
               </div>
-              <p className="text-gray-700/70">{getCurrentTime()}</p>
+              <p className="text-gray-700/70 dark:text-gray-700/70 light:text-gray-700/70">
+                {getCurrentTime()}
+              </p>
             </div>
 
             {/* Live indicator */}
@@ -97,7 +99,9 @@ const WeatherCard = ({ weather }) => {
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
               </span>
-              <span className="text-xs font-medium text-gray-800">LIVE</span>
+              <span className="text-xs font-medium text-gray-800 dark:text-gray-800 light:text-gray-800">
+                LIVE
+              </span>
             </div>
           </div>
 
@@ -119,14 +123,14 @@ const WeatherCard = ({ weather }) => {
             {/* Temperature */}
             <div className="text-center">
               <div className="relative">
-                <span className="text-[120px] font-light leading-none text-gray-800">
+                <span className="text-[120px] font-light leading-none text-gray-800 dark:text-gray-800 light:text-gray-800">
                   {Math.round(temperature)}°
                 </span>
               </div>
-              <p className="text-xl text-gray-700/80 mt-2">
+              <p className="text-xl text-gray-700/80 dark:text-gray-700/80 light:text-gray-700/80 mt-2">
                 Feels like {Math.round(feelsLike)}°
               </p>
-              <p className="text-lg text-gray-800/70 mt-1 capitalize">
+              <p className="text-lg text-gray-800/70 dark:text-gray-800/70 light:text-gray-800/70 mt-1 capitalize">
                 {description}
               </p>
             </div>
@@ -137,15 +141,15 @@ const WeatherCard = ({ weather }) => {
             {/* Wind */}
             <div className="bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-black/20 transition-all duration-300">
               <div className="flex items-center gap-2 mb-1">
-                <Wind className="w-4 h-4 text-gray-800" />
-                <span className="text-xs text-gray-700 uppercase tracking-wide">
+                <Wind className="w-4 h-4 text-gray-800 dark:text-gray-800 light:text-gray-800" />
+                <span className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                   Wind
                 </span>
               </div>
-              <p className="text-xl font-semibold text-gray-800">
+              <p className="text-xl font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
                 {Math.round(windSpeed)}
               </p>
-              <p className="text-xs text-gray-700/70 mt-1">
+              <p className="text-xs text-gray-700/70 dark:text-gray-700/70 light:text-gray-700/70 mt-1">
                 km/h {getWindDirection(windDirection)}
               </p>
             </div>
@@ -153,13 +157,15 @@ const WeatherCard = ({ weather }) => {
             {/* Humidity */}
             <div className="bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-black/20 transition-all duration-300">
               <div className="flex items-center gap-2 mb-1">
-                <Droplets className="w-4 h-4 text-gray-800" />
-                <span className="text-xs text-gray-700 uppercase tracking-wide">
+                <Droplets className="w-4 h-4 text-gray-800 dark:text-gray-800 light:text-gray-800" />
+                <span className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                   Humidity
                 </span>
               </div>
-              <p className="text-xl font-semibold text-gray-800">{humidity}%</p>
-              <p className="text-xs text-gray-700/70 mt-1">
+              <p className="text-xl font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
+                {humidity}%
+              </p>
+              <p className="text-xs text-gray-700/70 dark:text-gray-700/70 light:text-gray-700/70 mt-1">
                 {humidity > 70 ? "High" : humidity > 40 ? "Normal" : "Low"}
               </p>
             </div>
@@ -168,15 +174,17 @@ const WeatherCard = ({ weather }) => {
             {pressure && (
               <div className="bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-black/20 transition-all duration-300">
                 <div className="flex items-center gap-2 mb-1">
-                  <Gauge className="w-4 h-4 text-gray-800" />
-                  <span className="text-xs text-gray-700 uppercase tracking-wide">
+                  <Gauge className="w-4 h-4 text-gray-800 dark:text-gray-800 light:text-gray-800" />
+                  <span className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                     Pressure
                   </span>
                 </div>
-                <p className="text-xl font-semibold text-gray-800">
+                <p className="text-xl font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
                   {pressure}
                 </p>
-                <p className="text-xs text-gray-700/70 mt-1">hPa</p>
+                <p className="text-xs text-gray-700/70 dark:text-gray-700/70 light:text-gray-700/70 mt-1">
+                  hPa
+                </p>
               </div>
             )}
 
@@ -184,15 +192,17 @@ const WeatherCard = ({ weather }) => {
             {visibility && (
               <div className="bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20 hover:bg-black/20 transition-all duration-300">
                 <div className="flex items-center gap-2 mb-1">
-                  <Eye className="w-4 h-4 text-gray-800" />
-                  <span className="text-xs text-gray-700 uppercase tracking-wide">
+                  <Eye className="w-4 h-4 text-gray-800 dark:text-gray-800 light:text-gray-800" />
+                  <span className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                     Visibility
                   </span>
                 </div>
-                <p className="text-xl font-semibold text-gray-800">
+                <p className="text-xl font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
                   {(visibility / 1000).toFixed(1)}
                 </p>
-                <p className="text-xs text-gray-700/70 mt-1">km</p>
+                <p className="text-xs text-gray-700/70 dark:text-gray-700/70 light:text-gray-700/70 mt-1">
+                  km
+                </p>
               </div>
             )}
           </div>
@@ -200,8 +210,10 @@ const WeatherCard = ({ weather }) => {
           {/* Temperature Range Bar */}
           <div className="bg-black/10 backdrop-blur-sm rounded-xl p-4 border border-white/20 mb-6">
             <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-gray-700">Temperature Range</span>
-              <span className="text-sm font-medium text-gray-800">
+              <span className="text-sm text-gray-700 dark:text-gray-700 light:text-gray-700">
+                Temperature Range
+              </span>
+              <span className="text-sm font-medium text-gray-800 dark:text-gray-800 light:text-gray-800">
                 {Math.round(tempMin)}° / {Math.round(tempMax)}°
               </span>
             </div>
@@ -221,13 +233,13 @@ const WeatherCard = ({ weather }) => {
               {sunrise && (
                 <div className="flex items-center gap-3 bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
                   <div className="bg-orange-500/30 rounded-lg p-2">
-                    <Sunrise className="w-5 h-5 text-orange-700" />
+                    <Sunrise className="w-5 h-5 text-orange-700 dark:text-orange-700 light:text-orange-700" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-700 uppercase tracking-wide">
+                    <p className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                       Sunrise
                     </p>
-                    <p className="text-lg font-semibold text-gray-800">
+                    <p className="text-lg font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
                       {formatTime(sunrise)}
                     </p>
                   </div>
@@ -236,13 +248,13 @@ const WeatherCard = ({ weather }) => {
               {sunset && (
                 <div className="flex items-center gap-3 bg-black/10 backdrop-blur-sm rounded-xl p-3 border border-white/20">
                   <div className="bg-orange-500/30 rounded-lg p-2">
-                    <Sunset className="w-5 h-5 text-orange-700" />
+                    <Sunset className="w-5 h-5 text-orange-700 dark:text-orange-700 light:text-orange-700" />
                   </div>
                   <div>
-                    <p className="text-xs text-gray-700 uppercase tracking-wide">
+                    <p className="text-xs text-gray-700 dark:text-gray-700 light:text-gray-700 uppercase tracking-wide">
                       Sunset
                     </p>
-                    <p className="text-lg font-semibold text-gray-800">
+                    <p className="text-lg font-semibold text-gray-800 dark:text-gray-800 light:text-gray-800">
                       {formatTime(sunset)}
                     </p>
                   </div>

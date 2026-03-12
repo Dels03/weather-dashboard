@@ -2,7 +2,7 @@ import React, { useRef, useState, useEffect } from "react";
 import ForecastCard from "./ForecastCard";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-const ForecastList = ({ forecast }) => {
+const ForecastList = ({ forecast, timezone }) => {
   const scrollContainerRef = useRef(null);
   const [showLeftArrow, setShowLeftArrow] = useState(false);
   const [showRightArrow, setShowRightArrow] = useState(false);
@@ -80,7 +80,11 @@ const ForecastList = ({ forecast }) => {
               className="animate-fade-in-up"
               style={{ animationDelay: `${index * 0.05}s` }}
             >
-              <ForecastCard forecast={day} isToday={index === 0} />
+              <ForecastCard
+                forecast={day}
+                isToday={index === 0}
+                timezone={timezone}
+              />
             </div>
           ))}
         </div>

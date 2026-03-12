@@ -112,15 +112,14 @@ const SearchBar = () => {
 
       setCurrentWeather(transformedData);
 
-      // Add timezone to each forecast item
-      const forecastWithTimezone = forecastData.data.map((item) => ({
-        ...item,
-        timezone: transformedData.timezone,
-      }));
-      setForecast(forecastWithTimezone);
+      // Check if forecastData.data has daily property (from backend)
+      console.log("🔍 SearchBar - forecast data:", forecastData.data);
+
+      // The backend returns { daily: [...], hourly: [...] }
+      // We need to pass the entire object to setForecast
+      setForecast(forecastData.data);
     } catch (error) {
       setError("Failed to fetch weather data. Please try again.");
-      console.error("Weather fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -150,15 +149,17 @@ const SearchBar = () => {
 
       setCurrentWeather(transformedData);
 
-      // Add timezone to each forecast item
-      const forecastWithTimezone = forecastData.data.map((item) => ({
-        ...item,
-        timezone: transformedData.timezone,
-      }));
-      setForecast(forecastWithTimezone);
+      // Check if forecastData.data has daily property (from backend)
+      console.log(
+        "🔍 SearchBar - forecast data from direct search:",
+        forecastData.data,
+      );
+
+      // The backend returns { daily: [...], hourly: [...] }
+      // We need to pass the entire object to setForecast
+      setForecast(forecastData.data);
     } catch (error) {
       setError("City not found. Please check the name and try again.");
-      console.error("Weather fetch error:", error);
     } finally {
       setLoading(false);
     }
@@ -183,7 +184,6 @@ const SearchBar = () => {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         try {
-          // You'll need to implement reverse geocoding here
           setError("Geolocation feature coming soon!");
         } catch (error) {
           setError("Failed to get weather for your location");
@@ -201,14 +201,10 @@ const SearchBar = () => {
   return (
     <div className="relative flex-1 max-w-xl">
       <form onSubmit={handleSearch}>
-        {/* Search Input - Enhanced */}
-        <div className="relative group">
-          {/* Gradient border on focus */}
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl opacity-0 group-focus-within:opacity-100 transition-opacity duration-300 blur-sm"></div>
-
-          {/* Input container */}
+        {/* Search Input - Matching Reference Header */}
+        <div className="relative">
           <div className="relative flex items-center">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40 group-focus-within:text-blue-400 transition-colors" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 dark:text-white/60 light:text-gray-400" />
 
             <input
               ref={inputRef}
@@ -216,32 +212,31 @@ const SearchBar = () => {
               value={searchQuery}
               onChange={handleSearchChange}
               onFocus={() => setShowSuggestions(true)}
-              placeholder="Search for a city..."
-              className="w-full bg-white/5 border border-white/10 rounded-xl pl-11 pr-20 py-3 text-sm text-white placeholder-white/40 focus:outline-none focus:border-white/20 focus:bg-white/10 transition-all group-focus-within:bg-white/10"
-              minLength="2"
+              placeholder="Search city..."
+              className="w-full bg-white/5 dark:bg-white/[0.05] light:bg-black/5 border border-white/10 dark:border-white/[0.08] light:border-black/10 rounded-xl pl-11 pr-20 py-2.5 text-sm text-gray-900 dark:text-white light:text-gray-900 placeholder-gray-400 dark:placeholder-white/50 light:placeholder-gray-400 focus:outline-none focus:border-[#4A90E2]/50 focus:bg-white/10 dark:focus:bg-white/[0.06] light:focus:bg-black/10 transition-all"
             />
 
             {/* Right side icons */}
             <div className="absolute right-3 top-1/2 -translate-y-1/2 flex items-center gap-1">
               {isSearching && (
-                <Loader2 className="w-4 h-4 text-white/40 animate-spin" />
+                <Loader2 className="w-4 h-4 text-gray-400 dark:text-white/50 light:text-gray-400 animate-spin" />
               )}
               {searchQuery && (
                 <button
                   type="button"
                   onClick={handleClearSearch}
-                  className="p-1 hover:bg-white/10 rounded-lg transition-colors"
+                  className="p-1 hover:bg-white/10 dark:hover:bg-white/[0.05] light:hover:bg-black/10 rounded-lg transition-colors"
                 >
-                  <X className="w-3.5 h-3.5 text-white/40" />
+                  <X className="w-3.5 h-3.5 text-gray-400 dark:text-white/50 light:text-gray-400 hover:text-gray-600 dark:hover:text-white/70 light:hover:text-gray-600" />
                 </button>
               )}
               <button
                 type="button"
                 onClick={handleGeolocation}
-                className="p-1.5 hover:bg-white/10 rounded-lg transition-colors group/geo"
+                className="p-1.5 hover:bg-white/10 dark:hover:bg-white/[0.05] light:hover:bg-black/10 rounded-lg transition-colors"
                 title="Use my location"
               >
-                <MapPin className="w-4 h-4 text-white/40 group-hover/geo:text-blue-400 transition-colors" />
+                <MapPin className="w-4 h-4 text-gray-400 dark:text-white/50 light:text-gray-400 hover:text-gray-600 dark:hover:text-white/70 light:hover:text-gray-600" />
               </button>
             </div>
           </div>
@@ -251,16 +246,15 @@ const SearchBar = () => {
         {showSuggestions && (
           <div
             ref={dropdownRef}
-            className="absolute z-50 w-full mt-2 glass-card overflow-hidden animate-fade-in-up"
-            style={{ animationDuration: "0.2s" }}
+            className="absolute z-50 w-full mt-2 bg-white dark:bg-[#1a1a1a] light:bg-white border border-white/10 dark:border-white/[0.08] light:border-black/10 rounded-xl overflow-hidden shadow-xl transition-colors duration-300"
           >
             {/* Recent searches section */}
             {searchQuery.length < 2 && recentSearches.length > 0 && (
-              <div className="p-2 border-b border-white/10">
+              <div className="p-2 border-b border-white/10 dark:border-white/[0.05] light:border-black/10">
                 <div className="flex items-center gap-2 px-3 py-2">
-                  <History className="w-3.5 h-3.5 text-white/30" />
-                  <span className="text-xs font-medium text-white/40 uppercase tracking-wider">
-                    Recent Searches
+                  <History className="w-3.5 h-3.5 text-gray-400 dark:text-white/30 light:text-gray-400" />
+                  <span className="text-xs font-medium text-gray-500 dark:text-white/40 light:text-gray-500 uppercase tracking-wider">
+                    Recent
                   </span>
                 </div>
                 {recentSearches.map((search, index) => (
@@ -272,10 +266,10 @@ const SearchBar = () => {
                         countryCode: search.country,
                       })
                     }
-                    className="w-full px-3 py-2.5 hover:bg-white/5 transition-colors rounded-lg flex items-center gap-3 group"
+                    className="w-full px-3 py-2.5 hover:bg-white/10 dark:hover:bg-white/[0.05] light:hover:bg-black/10 transition-colors rounded-lg flex items-center gap-3 text-left"
                   >
-                    <History className="w-3.5 h-3.5 text-white/20 group-hover:text-white/40 transition-colors" />
-                    <span className="text-sm text-white/70 group-hover:text-white">
+                    <History className="w-3.5 h-3.5 text-gray-300 dark:text-white/20 light:text-gray-300" />
+                    <span className="text-sm text-gray-700 dark:text-white/70 light:text-gray-700">
                       {search.name}, {search.country}
                     </span>
                   </button>
@@ -285,36 +279,30 @@ const SearchBar = () => {
 
             {/* Search results */}
             {suggestions.length > 0 ? (
-              <ul className="max-h-80 overflow-y-auto">
+              <ul className="max-h-80 overflow-y-auto custom-scrollbar">
                 {suggestions.map((city, index) => (
                   <li
                     key={`${city.cityName}-${index}`}
                     onClick={() => handleSelectCity(city)}
-                    className="px-4 py-3 hover:bg-white/10 cursor-pointer transition-all border-b border-white/5 last:border-b-0 group"
+                    className="px-4 py-3 hover:bg-white/10 dark:hover:bg-white/[0.05] light:hover:bg-black/10 cursor-pointer transition-all border-b border-white/10 dark:border-white/[0.03] light:border-black/10 last:border-b-0"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="relative">
-                        <div className="absolute inset-0 bg-blue-500/20 rounded-full blur-sm opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        <MapPin className="relative z-10 w-4 h-4 text-white/40 group-hover:text-blue-400 transition-colors" />
-                      </div>
+                      <MapPin className="w-4 h-4 text-gray-400 dark:text-white/30 light:text-gray-400" />
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="text-white text-sm font-medium group-hover:text-blue-400 transition-colors">
+                          <p className="text-gray-900 dark:text-white light:text-gray-900 text-sm font-medium">
                             {city.cityName}
                           </p>
                           {city.stateCode && (
-                            <span className="text-xs text-white/30">
+                            <span className="text-xs text-gray-500 dark:text-white/30 light:text-gray-500">
                               {city.stateCode}
                             </span>
                           )}
                         </div>
-                        <p className="text-xs text-white/40 group-hover:text-white/60 transition-colors">
+                        <p className="text-xs text-gray-500 dark:text-white/40 light:text-gray-500">
                           {city.countryCode}
                         </p>
                       </div>
-                      <span className="text-xs text-white/20 group-hover:text-white/40 transition-colors">
-                        ⚡
-                      </span>
                     </div>
                   </li>
                 ))}
@@ -323,8 +311,10 @@ const SearchBar = () => {
               searchQuery.length >= 2 &&
               !isSearching && (
                 <div className="px-4 py-8 text-center">
-                  <p className="text-sm text-white/30">No cities found</p>
-                  <p className="text-xs text-white/20 mt-1">
+                  <p className="text-sm text-gray-500 dark:text-white/30 light:text-gray-500">
+                    No cities found
+                  </p>
+                  <p className="text-xs text-gray-400 dark:text-white/20 light:text-gray-400 mt-1">
                     Try a different search term
                   </p>
                 </div>
@@ -334,8 +324,10 @@ const SearchBar = () => {
             {/* Loading state */}
             {isSearching && (
               <div className="px-4 py-8 text-center">
-                <Loader2 className="w-6 h-6 text-white/20 animate-spin mx-auto mb-2" />
-                <p className="text-xs text-white/30">Searching cities...</p>
+                <Loader2 className="w-6 h-6 text-gray-400 dark:text-white/20 light:text-gray-400 animate-spin mx-auto mb-2" />
+                <p className="text-xs text-gray-500 dark:text-white/30 light:text-gray-500">
+                  Searching...
+                </p>
               </div>
             )}
           </div>

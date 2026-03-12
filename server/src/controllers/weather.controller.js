@@ -57,6 +57,68 @@ class WeatherController {
     }
   }
 
+  /**
+   * Get UV Index data for a city
+   */
+  async getUVIndex(req, res, next) {
+    try {
+      const { city, country } = req.query;
+
+      if (!city) {
+        return res.status(400).json({
+          success: false,
+          message: "City name is required",
+        });
+      }
+
+      const uvData = await weatherService.getUVIndex(city, country);
+
+      res.json({
+        success: true,
+        data: uvData,
+      });
+    } catch (error) {
+      if (error.message === "City not found") {
+        return res.status(404).json({
+          success: false,
+          message: "City not found",
+        });
+      }
+      next(error);
+    }
+  }
+
+  /**
+   * Get air quality data for a city
+   */
+  async getAirQuality(req, res, next) {
+    try {
+      const { city, country } = req.query;
+
+      if (!city) {
+        return res.status(400).json({
+          success: false,
+          message: "City name is required",
+        });
+      }
+
+      const airQuality = await weatherService.getAirQuality(city, country);
+
+      res.json({
+        success: true,
+        data: airQuality,
+      });
+    } catch (error) {
+      if (error.message === "City not found") {
+        return res.status(404).json({
+          success: false,
+          message: "City not found",
+        });
+      }
+      next(error);
+    }
+  }
+
   async searchCities(req, res, next) {
     try {
       const { query } = req.query;

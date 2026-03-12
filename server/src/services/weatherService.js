@@ -89,9 +89,95 @@ class WeatherService {
     }
   }
 
+  /**
+   * Get UV Index data using OpenWeather One Call API 3.0
+   * @param {string} cityName - City name
+   * @param {string} countryCode - Optional country code
+   * @returns {Object} UV Index data including current and forecast
+   */
+  async getUVIndex(cityName, countryCode = null) {
+    try {
+      // Find city coordinates
+      const city = await City.findOne({
+        cityName: new RegExp(`^${cityName}$`, "i"),
+        ...(countryCode && { countryCode }),
+      });
+
+      if (!city) {
+        throw new Error("City not found");
+      }
+
+      // Fetch One Call API data (includes UV index)
+      const response = await axios.get(
+        "https://api.openweathermap.org/data/3.0/onecall",
+        {
+          params: {
+            lat: city.coordinates.coordinates[1],
+            lon: city.coordinates.coordinates[0],
+            appid: this.apiKey,
+            units: "metric",
+            exclude: "minutely,alerts", // Exclude data we don't need
+          },
+        },
+      );
+
+      return {
+        current: response.data.current,
+        hourly: response.data.hourly.slice(0, 24), // Next 24 hours
+        daily: response.data.daily.slice(0, 7), // Next 7 days
+      };
+    } catch (error) {
+      console.error(
+        "UV Index Service Error:",
+        error.response?.data || error.message,
+      );
+      throw error;
+    }
+  }
+
+  /**
+   * Get air quality data for a city
+   * @param {string} cityName - City name
+   * @param {string} countryCode - Optional country code
+   * @returns {Object} Air quality data
+   */
+  async getAirQuality(cityName, countryCode = null) {
+    try {
+      // Find city coordinates
+      const city = await City.findOne({
+        cityName: new RegExp(`^${cityName}$`, "i"),
+        ...(countryCode && { countryCode }),
+      });
+
+      if (!city) {
+        throw new Error("City not found");
+      }
+
+      // Fetch air quality data from OpenWeather API
+      const response = await axios.get(
+        "https://api.openweathermap.org/data/2.5/air_pollution",
+        {
+          params: {
+            lat: city.coordinates.coordinates[1],
+            lon: city.coordinates.coordinates[0],
+            appid: this.apiKey,
+          },
+        },
+      );
+
+      return response.data;
+    } catch (error) {
+      console.error(
+        "Air Quality Service Error:",
+        error.response?.data || error.message,
+      );
+      throw error;
+    }
+  }
+
   async searchCities(query) {
     try {
-      // First, try to search in our database
+      // First, try to search in database
       const dbCities = await City.find({
         $text: { $search: query },
       }).limit(5);
@@ -122,7 +208,7 @@ class WeatherService {
         return [];
       }
 
-      // Map all responses - don't filter out anything
+      // Map all responses
       const cities = response.data.map((city) => ({
         cityName: city.name,
         countryCode: city.country || "Unknown",
@@ -131,7 +217,7 @@ class WeatherService {
         longitude: city.lon,
       }));
 
-      // Save new cities to database (optional, for caching)
+      // Save new cities to database
       for (const cityData of response.data) {
         try {
           // Skip if no country code
@@ -155,7 +241,7 @@ class WeatherService {
             await newCity.save();
           }
         } catch (err) {
-          // Continue even if save fails (don't block search results)
+          // Continue even if save fails
           console.error("Error saving city:", err.message);
         }
       }
@@ -255,11 +341,16 @@ class WeatherService {
     });
   }
 
+  /**
+   * Map forecast response to include both daily aggregates and raw hourly data
+   * @param {Object} data - Raw API response from OpenWeather
+   * @returns {Object} Object containing daily forecasts and hourly data
+   */
   mapForecastResponse(data) {
     const dailyForecasts = [];
     const forecastMap = new Map();
 
-    // Group by day
+    // Group by day for daily forecast cards
     data.list.forEach((item) => {
       const date = new Date(item.dt * 1000).toDateString();
 
@@ -269,7 +360,7 @@ class WeatherService {
           temps: [],
           weathers: [],
           items: [],
-          pops: [], // ADD THIS LINE - store precipitation probabilities
+          pops: [],
         });
       }
 
@@ -277,7 +368,7 @@ class WeatherService {
       dayData.temps.push(item.main.temp);
       dayData.weathers.push(item.weather[0]);
       dayData.items.push(item);
-      dayData.pops.push(item.pop || 0); // ADD THIS LINE - collect pop values
+      dayData.pops.push(item.pop || 0);
     });
 
     // Calculate daily aggregates
@@ -285,10 +376,8 @@ class WeatherService {
       const tempHigh = Math.max(...value.temps);
       const tempLow = Math.min(...value.temps);
 
-      // Calculate average pop for the day
       const avgPop = value.pops.reduce((a, b) => a + b, 0) / value.pops.length;
 
-      // Get most frequent weather condition
       const weatherCounts = {};
       value.weathers.forEach((w) => {
         weatherCounts[w.main] = (weatherCounts[w.main] || 0) + 1;
@@ -301,20 +390,49 @@ class WeatherService {
         (w) => w.main === mainWeather,
       );
 
+      // Create a weather object with all necessary data
+      const weatherData = {
+        main: representativeWeather.main,
+        description: representativeWeather.description,
+        icon: representativeWeather.icon,
+      };
+
       dailyForecasts.push({
         date: value.date,
         tempHigh,
         tempLow,
-        condition: representativeWeather.main,
-        description: representativeWeather.description,
-        icon: representativeWeather.icon,
+        weather: weatherData,
         humidity: value.items[0].main.humidity,
         windSpeed: value.items[0].wind.speed,
-        pop: avgPop, // ADD THIS LINE - include pop in the response
+        pop: avgPop,
       });
     });
 
-    return dailyForecasts.slice(0, 5); // Return 5 days
+    // Return BOTH daily forecasts AND raw hourly data
+    return {
+      daily: dailyForecasts.slice(0, 5), // 5-day forecast for cards
+      hourly: data.list.map((item) => ({
+        dt: item.dt,
+        date: new Date(item.dt * 1000).toISOString(),
+        temp: item.main.temp,
+        feelsLike: item.main.feels_like,
+        tempMin: item.main.temp_min,
+        tempMax: item.main.temp_max,
+        pressure: item.main.pressure,
+        humidity: item.main.humidity,
+        weather: {
+          main: item.weather[0].main,
+          description: item.weather[0].description,
+          icon: item.weather[0].icon,
+        },
+        wind: {
+          speed: item.wind.speed,
+          direction: item.wind.deg,
+        },
+        clouds: item.clouds?.all,
+        pop: item.pop || 0,
+      })), // Raw 3-hour data for precipitation chart
+    };
   }
 }
 
